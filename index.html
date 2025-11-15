@@ -349,8 +349,8 @@
                     +995 577 96 08 80
                 </a>
                 
-                <!-- ელ. ფოსტა -->
-                <a id="footer-email-link" href="mailto:autoxpressge@gmail.com" class="hover:text-primary-red transition duration-200 flex items-center">
+                <!-- ელ. ფოსტა (NEW ID ADDED) -->
+                <a id="footer-email-link" href="#" target="_blank" class="hover:text-primary-red transition duration-200 flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     autoxpressge@gmail.com
                 </a>
@@ -423,7 +423,8 @@
         const contactToOrderButton = document.getElementById('contact-to-order-button');
         const contactModal = document.getElementById('contact-modal');
         const closeModalButton = document.getElementById('close-modal');
-        const gmailOrderLink = document.getElementById('gmail-order-link'); // ახალი ID Gmail ბმულისთვის
+        const gmailOrderLink = document.getElementById('gmail-order-link'); 
+        const footerEmailLink = document.getElementById('footer-email-link'); // NEW: Footer Email Link
         
         // Product Data (in-memory)
         const productData = {
@@ -559,7 +560,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             
-            // Gmail Link Configuration (NEW ADDITION)
+            // Gmail Link Configuration 
             const recipientEmail = 'autoxpressge@gmail.com'; 
             const subject = 'შეკვეთა | AutoXpress-ის საიტიდან'; // Sample Subject in Georgian
             const body = 'გამარჯობა, მსურს შევუკვეთო შემდეგი პროდუქტ(ებ)ი:\n\n[პროდუქტის სახელი: რაოდენობა]\n\nგთხოვთ დამიკავშირდეთ დეტალების დასაზუსტებლად. მადლობა!'; // Sample Body in Georgian
@@ -569,8 +570,13 @@
                                     '&su=' + encodeURIComponent(subject) +
                                     '&body=' + encodeURIComponent(body);
 
+            // Assign Gmail link to both elements
             if (gmailOrderLink) {
                 gmailOrderLink.href = gmailComposeUrl;
+            }
+            if (footerEmailLink) {
+                footerEmailLink.href = gmailComposeUrl;
+                footerEmailLink.target = "_blank"; // Ensure it opens in a new tab
             }
 
             // 1. მობილურის მენიუს გადართვა
