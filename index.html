@@ -3,10 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- სათაურის განახლება -->
-    <title>AutoXpress - ონლაინ მაღაზია</title>
-    <!-- Tailwind CSS-ის ჩატვირთვა -->
+    <title>AutoXpress - პროდუქტების კატალოგი</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK-ების ჩატვირთვა (თუმცა კალათა აღარ გამოიყენება, Firebase ინიციალიზაცია დარჩა) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // მხოლოდ Firestore ინიციალიზაცია
+        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // Log level for debugging
+        setLogLevel('Debug');
+
+        // Global variables for Firebase Config and App ID (Provided by Canvas)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth, userId = null;
+
+        // Function to initialize Firebase and authenticate
+        async function initializeFirebase() {
+            try {
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase configuration is missing.");
+                    return;
+                }
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Firebase Auth Ready. User ID:", userId);
+                        // Fire a custom event to notify the main JS that Firebase is ready
+                        document.dispatchEvent(new CustomEvent('firebase-ready'));
+                    } else {
+                        console.log("No user is signed in.");
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error initializing Firebase or signing in:", error);
+            }
+        }
+
+        window.db = db; // Making db and other variables globally accessible for the main script
+        window.auth = auth;
+        window.userId = userId;
+        window.appId = appId;
+
+        initializeFirebase();
+    </script>
     <!-- Tailwind-ის კონფიგურაცია -->
     <script>
         tailwind.config = {
@@ -23,36 +78,56 @@
         }
     </script>
     <style>
-        /* Inter ფონტის უზრუნველყოფა */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #ffffff;
-            color: #1f2937; /* მუქი ნაცრისფერი ტექსტისთვის */
+            color: #1f2937;
         }
-        /* მორგებული სქროლბარი */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background-color: #fca5a5; /* ღია წითელი */
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f3f4f6;
-        }
-        /* CSS ანიმაცია გვერდების გადასართავად */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background-color: #fca5a5; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: #f3f4f6; }
         .page-content {
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
-            min-height: 60vh; /* უზრუნველყოფს მინიმალურ სიმაღლეს კონტენტის შეცვლისას */
+            min-height: 60vh;
         }
         .page-content.active {
             opacity: 1;
         }
-
-        /* ანიმაცია პროდუქტების სიისთვის */
         .product-list-container {
             transition: opacity 0.3s ease-in-out;
+        }
+        
+        /* Modal Backdrop */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .modal-backdrop.show {
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+            width: 400px;
+            transform: scale(0.9);
+            transition: transform 0.2s ease-in-out;
+        }
+        .modal-backdrop.show .modal-content {
+            transform: scale(1);
         }
     </style>
 </head>
@@ -61,24 +136,30 @@
     <!-- Header & Navigation -->
     <header class="bg-white shadow-lg sticky top-0 z-50 rounded-b-xl">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-            <!-- ლოგო: AutoXpress (მხოლოდ 'X' არის წითელი) -->
+            <!-- ლოგო: AutoXpress -->
             <div class="text-3xl font-extrabold text-gray-800 cursor-pointer" data-page="home" id="logo-link">
                 <span class="text-gray-800">Auto</span><span class="text-primary-red">X</span><span class="text-gray-800">press</span>
             </div>
 
-            <!-- ნავიგაციის ლინკები (დესკტოპზე) - 'კონტაქტი' ამოღებულია -->
-            <nav class="hidden md:flex space-x-8">
+            <!-- ნავიგაციის ლინკები (დესკტოპზე) -->
+            <nav class="hidden md:flex items-center space-x-8">
                 <a href="#" data-page="home" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300 active-link">მთავარი</a>
                 <a href="#" data-page="products" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300">პროდუქტები</a>
                 <a href="#" data-page="about" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300">ჩვენს შესახებ</a>
+                
+                <!-- კალათის ხატულა ამოღებულია -->
             </nav>
 
             <!-- მობილურის მენიუს ღილაკი -->
-            <button id="mobile-menu-button" class="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-150">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
+            <div class="flex items-center md:hidden space-x-4">
+                 <!-- კალათის ხატულა მობილურზე ამოღებულია -->
+
+                <button id="mobile-menu-button" class="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-150">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
         </div>
-        <!-- მობილურის მენიუ (ჩამოსაშლელი) - 'კონტაქტი' ამოღებულია -->
+        <!-- მობილურის მენიუ (ჩამოსაშლელი) -->
         <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-2 bg-gray-50 rounded-b-xl">
             <a href="#" data-page="home" class="nav-link-mobile block text-gray-700 hover:bg-gray-200 p-2 rounded-lg transition duration-150 active-link">მთავარი</a>
             <a href="#" data-page="products" class="nav-link-mobile block text-gray-700 hover:bg-gray-200 p-2 rounded-lg transition duration-150">პროდუქტები</a>
@@ -90,16 +171,13 @@
         <!-- Hero/მთავარი სექცია -->
         <section id="home" data-section="home" class="page-content active relative bg-primary-red bg-opacity-10 py-20 sm:py-32 overflow-hidden">
             <div class="container mx-auto px-4 text-center">
-                <!-- სათაური -->
                 <h1 class="text-4xl sm:text-6xl font-black mb-4 leading-tight text-gray-800">
                     საუკეთესო მანქანის <br class="hidden sm:block">
                     <span class="text-primary-red">ნაწილები</span> ონლაინ
                 </h1>
-                <!-- ქვესათაური -->
                 <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
                     მაღალი ხარისხის სათადარიგო ნაწილები, აქსესუარები და კომპონენტები თქვენი ავტომობილისთვის, სწრაფი მიწოდებით!
                 </p>
-                <!-- ღილაკი: პროდუქტების გამოჩენა და გადასვლა პროდუქტებზე -->
                 <button id="view-products-button" data-page="products" class="inline-block bg-primary-red text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-105">
                     პროდუქტების ნახვა
                 </button>
@@ -114,15 +192,13 @@
                 <!-- პროდუქტების კატეგორიები -->
                 <div id="product-categories" class="product-list-container grid grid-cols-1 md:grid-cols-3 gap-8">
                     
-                    <!-- კატეგორია 1: ძირითადი ნაწილები (განახლებული) -->
+                    <!-- კატეგორია 1: ძირითადი ნაწილები -->
                     <div class="bg-gray-50 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border-t-4 border-primary-red">
                         <div class="text-primary-red mb-4">
-                            <!-- ხატულა ძირითადი ნაწილებისთვის -->
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6a2 2 0 100 4m0-4a2 2 0 110 4m0 0v6m6-6a2 2 0 100 4m0-4a2 2 0 110 4m0 0v2"></path></svg>
                         </div>
                         <h3 class="text-2xl font-semibold mb-3 text-primary-red">ძირითადი ნაწილები</h3>
                         <p class="text-gray-600 mb-4">სამუხრუჭე სისტემები, ფილტრები, ანთების სანთლები. ყველაფერი რეგულარული სერვისისთვის.</p>
-                        <!-- ღილაკი პროდუქტის სიის გამოსატანად -->
                         <button class="show-subcategory-btn text-primary-red font-medium hover:text-red-700 flex items-center" data-category="basic">
                             ნახვა
                             <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -132,7 +208,6 @@
                     <!-- კატეგორია 2: ძრავის ნაწილები -->
                     <div class="bg-gray-50 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border-t-4 border-primary-red">
                         <div class="text-primary-red mb-4">
-                            <!-- ხატულა ძრავის ნაწილებისთვის -->
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         </div>
                         <h3 class="text-2xl font-semibold mb-3 text-primary-red">ძრავის ნაწილები</h3>
@@ -146,7 +221,6 @@
                     <!-- კატეგორია 3: აქსესუარები -->
                     <div class="bg-gray-50 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border-t-4 border-primary-red">
                         <div class="text-primary-red mb-4">
-                            <!-- ხატულა აქსესუარებისთვის -->
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c1.5-.2 2.705-1.01 3-2l4.95 4.95-4.95 4.95z"></path></svg>
                         </div>
                         <h3 class="text-2xl font-semibold mb-3 text-primary-red">აქსესუარები</h3>
@@ -158,34 +232,31 @@
                     </div>
                 </div>
 
-                <!-- სუბ-კატეგორიის პროდუქტების სია (თავდაპირველად დამალულია) -->
+                <!-- სუბ-კატეგორიის პროდუქტების სია -->
                 <div id="subcategory-view" class="product-list-container hidden">
                     <button id="back-to-categories" class="mb-6 flex items-center text-gray-600 hover:text-primary-red transition duration-200">
                         <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         უკან კატეგორიებში
                     </button>
                     
-                    <!-- სათაური განახლებული კლასებით -->
                     <h3 id="subcategory-title" class="text-2xl font-bold mb-8 text-gray-800"></h3>
                     
                     <!-- პროდუქტის ბლოკი: ჰაერის შემშვები (ფილტრი) -->
                     <div id="basic-parts-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- პროდუქტი 1 -->
+                        <!-- პროდუქტი 1 (დაკლიკვადი) -->
                         <div class="product-card bg-gray-50 p-5 rounded-xl shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-[1.02] cursor-pointer border border-gray-100" data-product-id="air-intake-filter">
-                            <!-- არ არის ფოტო/ემოჯი, მხოლოდ ტექსტი -->
                             <div class="text-center py-4">
                                 <h4 class="text-xl font-bold text-gray-800 mb-1">ჰაერის შემშვები (ფილტრი)</h4>
                                 <p class="text-2xl font-extrabold text-primary-red">60<span class="text-lg">₾</span></p>
                             </div>
                         </div>
-                        <!-- აქ დაემატება სხვა პროდუქტები მომავალში -->
                     </div>
                     
                 </div>
             </div>
         </section>
 
-        <!-- პროდუქტის დეტალების სექცია (თავდაპირველად დამალულია) -->
+        <!-- პროდუქტის დეტალების სექცია -->
         <section id="product-detail" data-section="product-detail" class="page-content hidden py-16 sm:py-24 bg-gray-50">
             <div class="container mx-auto px-4 max-w-4xl">
                  <button id="back-to-list" class="mb-8 flex items-center text-gray-600 hover:text-primary-red transition duration-200">
@@ -194,27 +265,25 @@
                 </button>
 
                 <div class="bg-white p-8 rounded-2xl shadow-2xl">
-                    <h2 id="detail-name" class="text-4xl font-bold text-gray-800 mb-4">ჰაერის შემშვები (ფილტრი)</h2>
-                    <p id="detail-price" class="text-3xl font-extrabold text-primary-red mb-6">60₾</p>
+                    <h2 id="detail-name" class="text-4xl font-bold text-gray-800 mb-4"></h2>
+                    <p id="detail-price" class="text-3xl font-extrabold text-primary-red mb-6"></p>
                     
-                    <!-- აღწერა -->
                     <div class="border-t pt-6">
                         <h3 class="text-2xl font-semibold text-gray-800 mb-3">პროდუქტის აღწერა</h3>
-                        <ul class="list-disc list-inside text-lg text-gray-700 space-y-2">
-                            <li>ზომა: 76მმ / 3ინჩი</li>
-                            <li>მაღალი ხარისხის, მრავალჯერადი გამოყენების შემშვები ფილტრი.</li>
-                            <li>უზრუნველყოფს გაუმჯობესებულ ჰაერის ნაკადს ძრავისთვის.</li>
+                        <ul id="detail-description-list" class="list-disc list-inside text-lg text-gray-700 space-y-2">
+                            <!-- აღწერის პუნქტები -->
                         </ul>
                     </div>
                     
-                    <button class="mt-8 inline-block bg-primary-red text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-[1.01]">
-                        ყიდვა
+                    <!-- ეს ღილაკი აჩენს საკონტაქტო მოდელს -->
+                    <button id="contact-to-order-button" class="mt-8 inline-block bg-primary-red text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-[1.01]">
+                        შეკვეთისთვის დაგვიკავშირდით
                     </button>
                 </div>
             </div>
         </section>
         
-        <!-- ჩვენს შესახებ სექცია (თავდაპირველად დამალულია) -->
+        <!-- ჩვენს შესახებ სექცია -->
         <section id="about" data-section="about" class="page-content hidden py-16 sm:py-24 bg-gray-50">
             <div class="container mx-auto px-4 max-w-4xl">
                 <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">ჩვენს შესახებ</h2>
@@ -229,10 +298,34 @@
             </div>
         </section>
         
-        <!-- 'კონტაქტი' სექცია ამოღებულია -->
     </main>
+    
+    <!-- საკონტაქტო მოდელი (Modal) -->
+    <div id="contact-modal" class="modal-backdrop hidden">
+        <div class="modal-content text-center">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">დაგვიკავშირდით შეკვეთისთვის</h3>
+            <p class="text-gray-600 mb-6">აირჩიეთ სასურველი საკონტაქტო მეთოდი:</p>
 
-    <!-- ქვედა კოლონტიტული (განახლებული) -->
+            <div class="space-y-4">
+                <a href="tel:+995577960880" class="w-full inline-flex items-center justify-center bg-green-500 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-green-600 transition duration-300">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                    დარეკეთ ახლავე (+995 577 96 08 80)
+                </a>
+
+                <a href="mailto:autoxpressge@gmail.com" class="w-full inline-flex items-center justify-center bg-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-600 transition duration-300">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    ელ. ფოსტის გაგზავნა
+                </a>
+            </div>
+
+            <button id="close-modal" class="mt-6 text-gray-500 hover:text-gray-700 transition duration-300 text-sm">
+                დახურვა
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ქვედა კოლონტიტული -->
     <footer class="bg-gray-800 text-white mt-12 py-8 rounded-t-xl">
         <div class="container mx-auto px-4 text-center">
             <!-- ბრენდის სახელი -->
@@ -279,153 +372,164 @@
     </footer>
 
     <!-- JavaScript გვერდების მართვისთვის -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const viewProductsButton = document.getElementById('view-products-button');
+    <script type="module">
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Utility Functions ---
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // --- UI Rendering and Application Logic ---
+        
+        // DOM Elements
+        const menuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const viewProductsButton = document.getElementById('view-products-button');
+        const sections = document.querySelectorAll('.page-content');
+        const navLinks = document.querySelectorAll('.nav-link, .nav-link-mobile, #logo-link'); 
+        const productCategories = document.getElementById('product-categories');
+        const subcategoryView = document.getElementById('subcategory-view');
+        const backToCategoriesButton = document.getElementById('back-to-categories');
+        const subcategoryButtons = document.querySelectorAll('.show-subcategory-btn');
+        const productCards = document.querySelectorAll('.product-card');
+        const productDetailSection = document.getElementById('product-detail');
+        const backToListButton = document.getElementById('back-to-list');
+        const subcategoryTitle = document.getElementById('subcategory-title');
+
+        // Modal Elements
+        const contactToOrderButton = document.getElementById('contact-to-order-button');
+        const contactModal = document.getElementById('contact-modal');
+        const closeModalButton = document.getElementById('close-modal');
+        
+        // Product Data (in-memory)
+        const productData = {
+            'air-intake-filter': {
+                id: 'air-intake-filter',
+                name: 'ჰაერის შემშვები (ფილტრი)',
+                price: 60, // ფასი როგორც რიცხვი
+                description: [
+                    'ზომა: 76მმ / 3ინჩი',
+                    'მაღალი ხარისხის, მრავალჯერადი გამოყენების შემშვები ფილტრი.',
+                    'უზრუნველყოფს გაუმჯობესებულ ჰაერის ნაკადს ძრავისთვის.',
+                ]
+            }
+        };
+
+        // --- Core UI Functions ---
+
+        function showPage(pageId) {
+            sections.forEach(section => {
+                section.classList.add('hidden');
+                section.classList.remove('active');
+            });
+
+            const targetSection = document.querySelector(`[data-section="${pageId}"]`);
+            if (targetSection) {
+                setTimeout(() => {
+                    targetSection.classList.remove('hidden');
+                    targetSection.classList.add('active');
+                }, 50);
+            }
+
+            // Update active link styling
+            document.querySelectorAll('.nav-link, .nav-link-mobile').forEach(link => {
+                link.classList.remove('text-primary-red', 'font-bold');
+                link.classList.add('text-gray-700', 'font-semibold');
+                if (link.dataset.page === pageId) {
+                    link.classList.add('text-primary-red', 'font-bold');
+                    link.classList.remove('text-gray-700', 'font-semibold');
+                }
+            });
+
+            mobileMenu.classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showProductList(category) {
+            productCategories.classList.add('opacity-0');
             
-            // სექციების და ნავიგაციის ლინკების შერჩევა
-            const sections = document.querySelectorAll('.page-content');
-            // 'კონტაქტი' ლინკი ამოღებულია
-            const navLinks = document.querySelectorAll('.nav-link, .nav-link-mobile'); 
-            const logoLink = document.getElementById('logo-link');
+            setTimeout(() => {
+                productCategories.classList.add('hidden');
+                subcategoryView.classList.remove('hidden');
+                
+                // Show list title
+                subcategoryTitle.textContent = 'ძირითადი ნაწილები';
+                subcategoryTitle.classList.remove('text-gray-800');
+                subcategoryTitle.classList.add('text-primary-red');
+                
+                document.getElementById('basic-parts-list').classList.remove('hidden');
 
-            const productCategories = document.getElementById('product-categories');
-            const subcategoryView = document.getElementById('subcategory-view');
-            const backToCategoriesButton = document.getElementById('back-to-categories');
-            const subcategoryButtons = document.querySelectorAll('.show-subcategory-btn');
-            const productCards = document.querySelectorAll('.product-card');
-            const productDetailSection = document.getElementById('product-detail');
-            const backToListButton = document.getElementById('back-to-list');
-            const subcategoryTitle = document.getElementById('subcategory-title'); // სათაურის ობიექტი
+                setTimeout(() => {
+                    subcategoryView.classList.add('opacity-100');
+                }, 10);
+                
+            }, 300);
+        }
 
-            // პროდუქტის მონაცემები
-            const productData = {
-                'air-intake-filter': {
-                    name: 'ჰაერის შემშვები (ფილტრი)',
-                    price: '60₾',
-                    description: [
-                        'ზომა: 76მმ / 3ინჩი',
-                        'მაღალი ხარისხის, მრავალჯერადი გამოყენების შემშვები ფილტრი.',
-                        'უზრუნველყოფს გაუმჯობესებულ ჰაერის ნაკადს ძრავისთვის.',
-                    ]
-                }
-                // სხვა პროდუქტები აქ დაემატება
-            };
+        function showCategories() {
+            productDetailSection.classList.add('hidden');
+            subcategoryView.classList.add('opacity-0');
 
-
-            // ფუნქცია გვერდის გადასართავად
-            function showPage(pageId) {
-                // დამალე ყველა სექცია
-                sections.forEach(section => {
-                    section.classList.add('hidden');
-                    section.classList.remove('active');
-                });
-
-                // მოძებნე და გამოაჩინე შესაბამისი სექცია
-                const targetSection = document.querySelector(`[data-section="${pageId}"]`);
-                if (targetSection) {
-                    // დაამატე მცირე დაყოვნება opacity ანიმაციისთვის
-                    setTimeout(() => {
-                        targetSection.classList.remove('hidden');
-                        targetSection.classList.add('active');
-                    }, 50);
-                }
-
-                // აქტიური ლინკის მონიშვნა
-                navLinks.forEach(link => {
-                    link.classList.remove('text-primary-red', 'font-bold');
-                    link.classList.add('text-gray-700', 'font-semibold');
-                    if (link.dataset.page === pageId) {
-                        link.classList.add('text-primary-red', 'font-bold');
-                        link.classList.remove('text-gray-700', 'font-semibold');
-                    }
-                });
-
-                // თუ მობილურის მენიუ ღიაა, დახურე
-                mobileMenu.classList.add('hidden');
-
-                // გვერდის ზემოთ ასქროლვა
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-
-            // ფუნქცია პროდუქტის სიის გამოსატანად
-            function showProductList(category) {
-                // დამალე კატეგორიები
-                productCategories.classList.add('opacity-0');
+            subcategoryTitle.classList.remove('text-primary-red');
+            subcategoryTitle.classList.add('text-gray-800');
+            
+            setTimeout(() => {
+                subcategoryView.classList.add('hidden');
+                productCategories.classList.remove('hidden');
                 
                 setTimeout(() => {
-                    productCategories.classList.add('hidden');
-                    subcategoryView.classList.remove('hidden');
-                    
-                    // სათაურის შეცვლა
-                    subcategoryTitle.textContent = 'ძირითადი ნაწილები';
-                    // აქტიური კატეგორიის სათაურის გაწითლება
-                    subcategoryTitle.classList.remove('text-gray-800');
-                    subcategoryTitle.classList.add('text-primary-red');
-                    
-                    // კონკრეტული სიის გამოჩენა
-                    document.getElementById('basic-parts-list').classList.remove('hidden');
+                    productCategories.classList.remove('opacity-0');
+                    productCategories.classList.add('opacity-100');
+                }, 10);
 
-                    // გამოაჩინე სუბ-კატეგორიის ხედი ანიმაციით
-                    setTimeout(() => {
-                        subcategoryView.classList.add('opacity-100');
-                    }, 10);
-                    
-                }, 300);
+            }, 300);
+        }
+
+        function showProductDetail(productId) {
+            const product = productData[productId];
+
+            if (!product) {
+                console.error('პროდუქტი ვერ მოიძებნა:', productId);
+                return;
             }
+            
+            // Update content
+            document.getElementById('detail-name').textContent = product.name;
+            document.getElementById('detail-price').textContent = `${product.price}₾`;
 
-            // ფუნქცია კატეგორიების ხედზე დასაბრუნებლად
-            function showCategories() {
-                 // დამალე პროდუქტის დეტალები, თუ გამოჩენილია
-                productDetailSection.classList.add('hidden');
-                
-                subcategoryView.classList.add('opacity-0');
+            const descList = document.getElementById('detail-description-list');
+            descList.innerHTML = '';
+            product.description.forEach(desc => {
+                const li = document.createElement('li');
+                li.textContent = desc;
+                descList.appendChild(li);
+            });
+            
+            // Hide list and show details
+            document.getElementById('products').classList.add('hidden');
+            productDetailSection.classList.remove('hidden');
+            productDetailSection.classList.add('active'); 
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-                // სათაურის ფერის დაბრუნება ნაგულისხმევზე
-                subcategoryTitle.classList.remove('text-primary-red');
-                subcategoryTitle.classList.add('text-gray-800');
-                
-                setTimeout(() => {
-                    subcategoryView.classList.add('hidden');
-                    productCategories.classList.remove('hidden');
-                    
-                    setTimeout(() => {
-                        productCategories.classList.remove('opacity-0');
-                        productCategories.classList.add('opacity-100');
-                    }, 10);
 
-                }, 300);
-            }
+        // --- Main Event Listeners ---
 
-            // ფუნქცია პროდუქტის დეტალების გამოსატანად
-            function showProductDetail(productId) {
-                const product = productData[productId];
-
-                if (!product) {
-                    console.error('პროდუქტი ვერ მოიძებნა:', productId);
-                    return;
-                }
-                
-                // კონტენტის განახლება
-                document.getElementById('detail-name').textContent = product.name;
-                document.getElementById('detail-price').textContent = product.price;
-
-                const descList = document.querySelector('#product-detail ul');
-                descList.innerHTML = '';
-                product.description.forEach(desc => {
-                    const li = document.createElement('li');
-                    li.textContent = desc;
-                    descList.appendChild(li);
-                });
-
-                // პროდუქტების სიის დამალვა და დეტალების გამოჩენა
-                document.getElementById('products').classList.add('hidden');
-                productDetailSection.classList.remove('hidden');
-                productDetailSection.classList.add('active'); // ანიმაციისთვის
-            }
-
+        document.addEventListener('DOMContentLoaded', () => {
+            
             // 1. მობილურის მენიუს გადართვა
             menuButton.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
@@ -435,36 +539,33 @@
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    // თუ პროდუქტების სექციაზე გადადის, აღდგება კატეგორიების ხედი
+                    
                     if (link.dataset.page === 'products') {
                         showCategories();
+                        productDetailSection.classList.add('hidden'); // Ensure details are hidden on product list view
                     }
-                    // თუ სხვა გვერდზე გადადის, პროდუქტის დეტალები უნდა დაიმალოს
-                    if (link.dataset.page !== 'product-detail') {
-                         productDetailSection.classList.add('hidden');
-                    }
-
+                    
                     const page = link.dataset.page;
-                    showPage(page);
+                    // Prevent navigation if no data-page attribute is present (e.g. cart buttons)
+                    if (page) {
+                       showPage(page);
+                    }
                 });
             });
 
             // 3. "პროდუქტების ნახვა" ღილაკზე დაჭერით გადართვა
             if (viewProductsButton) {
                 viewProductsButton.addEventListener('click', () => {
-                    showCategories(); // კატეგორიების ხედის ჩვენება
+                    showCategories(); 
                     showPage('products');
                 });
             }
 
-            // 4. კატეგორიის ღილაკებზე დაჭერა (მხოლოდ "ძირითადი ნაწილები" მუშაობს ამ ეტაპზე)
+            // 4. კატეგორიის ღილაკებზე დაჭერა
             subcategoryButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     if (button.dataset.category === 'basic') {
                         showProductList('basic');
-                    } else {
-                         // სხვა კატეგორიებისთვის გაგზავნა "მალე იქნება"
-                         console.log("ეს კატეგორია მალე დაემატება.");
                     }
                 });
             });
@@ -482,16 +583,34 @@
 
             // 7. უკან პროდუქტების სიაში ღილაკი
             backToListButton.addEventListener('click', () => {
-                productDetailSection.classList.add('hidden'); // დეტალების დამალვა
-                showPage('products'); // პროდუქტების სექციის ჩვენება
-                showProductList('basic'); // ისევ სიის ჩვენება
+                productDetailSection.classList.add('hidden'); 
+                showPage('products'); 
+                showProductList('basic'); 
             });
 
             // 8. ლოგოზე დაჭერა მთავარ გვერდზე დასაბრუნებლად
-            logoLink.addEventListener('click', () => {
+            document.getElementById('logo-link').addEventListener('click', () => {
                 showPage('home');
             });
             
+            // 9. საკონტაქტო ღილაკზე დაჭერა (მოდელის გასახსნელად)
+            contactToOrderButton.addEventListener('click', () => {
+                showModal('contact-modal');
+            });
+
+            // 10. მოდელის დახურვა
+            closeModalButton.addEventListener('click', () => {
+                closeModal('contact-modal');
+            });
+
+            // ასევე, თუ დააწკაპუნებენ მოდელის ფონზე
+            contactModal.addEventListener('click', (e) => {
+                if (e.target === contactModal) {
+                    closeModal('contact-modal');
+                }
+            });
+
+
             // გვერდის ჩატვირთვისას ნაგულისხმევი გვერდის გამოჩენა
             showPage('home');
         });
