@@ -5,24 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoXpress - პროდუქტების კატალოგი</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDK-ების ჩატვირთვა (თუმცა კალათა აღარ გამოიყენება, Firebase ინიციალიზაცია დარჩა) -->
+    <!-- Firebase SDK-ების ჩატვირთვა (ინიციალიზაცია დარჩა, თუმცა აპლიკაცია არ იყენებს) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // მხოლოდ Firestore ინიციალიზაცია
         import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Log level for debugging
         setLogLevel('Debug');
 
-        // Global variables for Firebase Config and App ID (Provided by Canvas)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let db, auth, userId = null;
 
-        // Function to initialize Firebase and authenticate
         async function initializeFirebase() {
             try {
                 if (Object.keys(firebaseConfig).length === 0) {
@@ -43,7 +39,6 @@
                     if (user) {
                         userId = user.uid;
                         console.log("Firebase Auth Ready. User ID:", userId);
-                        // Fire a custom event to notify the main JS that Firebase is ready
                         document.dispatchEvent(new CustomEvent('firebase-ready'));
                     } else {
                         console.log("No user is signed in.");
@@ -55,7 +50,7 @@
             }
         }
 
-        window.db = db; // Making db and other variables globally accessible for the main script
+        window.db = db;
         window.auth = auth;
         window.userId = userId;
         window.appId = appId;
@@ -68,7 +63,7 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary-red': '#dc2626', // სტანდარტული წითელი
+                        'primary-red': '#dc2626',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -146,14 +141,10 @@
                 <a href="#" data-page="home" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300 active-link">მთავარი</a>
                 <a href="#" data-page="products" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300">პროდუქტები</a>
                 <a href="#" data-page="about" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300">ჩვენს შესახებ</a>
-                
-                <!-- კალათის ხატულა ამოღებულია -->
             </nav>
 
             <!-- მობილურის მენიუს ღილაკი -->
             <div class="flex items-center md:hidden space-x-4">
-                 <!-- კალათის ხატულა მობილურზე ამოღებულია -->
-
                 <button id="mobile-menu-button" class="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-150">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
@@ -318,7 +309,7 @@
                     დარეკეთ ახლავე (+995 577 96 08 80)
                 </a>
 
-                <!-- ეს ლინკი ახლა იქნება Gmail-ის ბმული -->
+                <!-- ეს ლინკი არის gmail-ის ლინკი, რომელიც JS-ის მეშვეობით შეივსება -->
                 <a id="gmail-order-link" href="#" target="_blank" class="w-full inline-flex items-center justify-center bg-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:bg-blue-600 transition duration-300">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     ელ. ფოსტის გაგზავნა
@@ -349,8 +340,8 @@
                     +995 577 96 08 80
                 </a>
                 
-                <!-- ელ. ფოსტა (NEW ID ADDED) -->
-                <a id="footer-email-link" href="#" target="_blank" class="hover:text-primary-red transition duration-200 flex items-center">
+                <!-- ელ. ფოსტა (ID ADDED AND HREF SET TO #) -->
+                <a id="footer-email-link" href="#" target="_blank" rel="noopener noreferrer" class="hover:text-primary-red transition duration-200 flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     autoxpressge@gmail.com
                 </a>
@@ -380,9 +371,7 @@
 
     <!-- JavaScript გვერდების მართვისთვის -->
     <script type="module">
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- Utility Functions ---
+        // --- Utility Functions (Same as before) ---
         function showModal(modalId) {
             const modal = document.getElementById(modalId);
             modal.classList.remove('hidden');
@@ -399,7 +388,7 @@
             }, 200);
         }
 
-        // --- UI Rendering and Application Logic ---
+        // --- Core UI Functions (Same as before) ---
         
         // DOM Elements
         const menuButton = document.getElementById('mobile-menu-button');
@@ -418,20 +407,19 @@
         const basicPartsList = document.getElementById('basic-parts-list');
         const emptyCategoryMessage = document.getElementById('empty-category-message');
 
-
         // Modal Elements
         const contactToOrderButton = document.getElementById('contact-to-order-button');
         const contactModal = document.getElementById('contact-modal');
         const closeModalButton = document.getElementById('close-modal');
         const gmailOrderLink = document.getElementById('gmail-order-link'); 
-        const footerEmailLink = document.getElementById('footer-email-link'); // NEW: Footer Email Link
+        const footerEmailLink = document.getElementById('footer-email-link'); // Footer Email Link
         
         // Product Data (in-memory)
         const productData = {
             'air-intake-filter': {
                 id: 'air-intake-filter',
                 name: 'ჰაერის შემშვები (ფილტრი)',
-                price: 60, // ფასი როგორც რიცხვი
+                price: 60,
                 description: [
                     'ზომა: 76მმ / 3ინჩი',
                     'მაღალი ხარისხის, მრავალჯერადი გამოყენების შემშვები ფილტრი.',
@@ -481,7 +469,6 @@
         function showProductList(category) {
             productCategories.classList.add('opacity-0');
             
-            // დამალე ყველა კონტენტის ბლოკი
             basicPartsList.classList.add('hidden');
             emptyCategoryMessage.classList.add('hidden');
 
@@ -489,16 +476,13 @@
                 productCategories.classList.add('hidden');
                 subcategoryView.classList.remove('hidden');
                 
-                // Show list title
                 subcategoryTitle.textContent = categoryTitles[category] || 'პროდუქტები';
                 subcategoryTitle.classList.remove('text-gray-800');
                 subcategoryTitle.classList.add('text-primary-red');
                 
-                // აჩვენე კონკრეტული კონტენტი კატეგორიის მიხედვით
                 if (category === 'basic') {
                     basicPartsList.classList.remove('hidden');
                 } else {
-                    // სხვა კატეგორიებისთვის (ძრავის ნაწილები, აქსესუარები) აჩვენე ცარიელი შეტყობინება
                     emptyCategoryMessage.classList.remove('hidden');
                 }
 
@@ -560,49 +544,51 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             
-            // Gmail Link Configuration 
+            // GMAIL LINK CONFIGURATION (FIX FOR WEBSITE)
             const recipientEmail = 'autoxpressge@gmail.com'; 
-            const subject = 'შეკვეთა | AutoXpress-ის საიტიდან'; // Sample Subject in Georgian
-            const body = 'გამარჯობა, მსურს შევუკვეთო შემდეგი პროდუქტ(ებ)ი:\n\n[პროდუქტის სახელი: რაოდენობა]\n\nგთხოვთ დამიკავშირდეთ დეტალების დასაზუსტებლად. მადლობა!'; // Sample Body in Georgian
+            const subject = 'შეკვეთა | AutoXpress-ის საიტიდან'; 
+            const body = 'გამარჯობა, მსურს შევუკვეთო შემდეგი პროდუქტ(ებ)ი:\n\n[პროდუქტის სახელი: რაოდენობა]\n\nგთხოვთ დამიკავშირდეთ დეტალების დასაზუსტებლად. მადლობა!'; 
             
             const gmailComposeUrl = 'https://mail.google.com/mail/?view=cm&fs=1' +
                                     '&to=' + encodeURIComponent(recipientEmail) +
                                     '&su=' + encodeURIComponent(subject) +
                                     '&body=' + encodeURIComponent(body);
 
-            // Assign Gmail link to both elements
+            // 1. Assign Gmail link to modal button
             if (gmailOrderLink) {
                 gmailOrderLink.href = gmailComposeUrl;
             }
+
+            // 2. Assign Gmail link to footer email link
+            // This is the crucial part that ensures the footer link works everywhere
             if (footerEmailLink) {
                 footerEmailLink.href = gmailComposeUrl;
-                footerEmailLink.target = "_blank"; // Ensure it opens in a new tab
+                footerEmailLink.target = "_blank"; 
             }
 
-            // 1. მობილურის მენიუს გადართვა
+            // 3. მობილურის მენიუს გადართვა
             menuButton.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
             });
 
-            // 2. ნავიგაციის ლინკებზე დაწკაპუნების მოსმენა
+            // 4. ნავიგაციის ლინკებზე დაწკაპუნების მოსმენა
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     
                     if (link.dataset.page === 'products') {
                         showCategories();
-                        productDetailSection.classList.add('hidden'); // Ensure details are hidden on product list view
+                        productDetailSection.classList.add('hidden'); 
                     }
                     
                     const page = link.dataset.page;
-                    // Prevent navigation if no data-page attribute is present (e.g. cart buttons)
                     if (page) {
                        showPage(page);
                     }
                 });
             });
 
-            // 3. "პროდუქტების ნახვა" ღილაკზე დაჭერით გადართვა
+            // 5. "პროდუქტების ნახვა" ღილაკზე დაჭერით გადართვა
             if (viewProductsButton) {
                 viewProductsButton.addEventListener('click', () => {
                     showCategories(); 
@@ -610,7 +596,7 @@
                 });
             }
 
-            // 4. კატეგორიის ღილაკებზე დაჭერა (განახლებულია ყველა კატეგორიისთვის)
+            // 6. კატეგორიის ღილაკებზე დაჭერა 
             subcategoryButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const category = button.dataset.category;
@@ -618,10 +604,10 @@
                 });
             });
 
-            // 5. უკან კატეგორიებში ღილაკი
+            // 7. უკან კატეგორიებში ღილაკი
             backToCategoriesButton.addEventListener('click', showCategories);
             
-            // 6. პროდუქტის ბარათზე დაჭერა (დეტალების სანახავად)
+            // 8. პროდუქტის ბარათზე დაჭერა (დეტალების სანახავად)
             productCards.forEach(card => {
                 card.addEventListener('click', () => {
                     const productId = card.dataset.productId;
@@ -629,30 +615,29 @@
                 });
             });
 
-            // 7. უკან პროდუქტების სიაში ღილაკი
+            // 9. უკან პროდუქტების სიაში ღილაკი
             backToListButton.addEventListener('click', () => {
                 productDetailSection.classList.add('hidden'); 
-                // როდესაც უკან ვბრუნდებით, ვაჩვენებთ "ძირითად ნაწილებს", როგორც ნაგულისხმევ კატეგორიას
                 showPage('products'); 
                 showProductList('basic'); 
             });
 
-            // 8. ლოგოზე დაჭერა მთავარ გვერდზე დასაბრუნებლად
+            // 10. ლოგოზე დაჭერა მთავარ გვერდზე დასაბრუნებლად
             document.getElementById('logo-link').addEventListener('click', () => {
                 showPage('home');
             });
             
-            // 9. საკონტაქტო ღილაკზე დაჭერა (მოდელის გასახსნელად)
+            // 11. საკონტაქტო ღილაკზე დაჭერა (მოდელის გასახსნელად)
             contactToOrderButton.addEventListener('click', () => {
                 showModal('contact-modal');
             });
 
-            // 10. მოდელის დახურვა
+            // 12. მოდელის დახურვა
             closeModalButton.addEventListener('click', () => {
                 closeModal('contact-modal');
             });
 
-            // ასევე, თუ დააწკაპუნებენ მოდელის ფონზე
+            // 13. ასევე, თუ დააწკაპუნებენ მოდელის ფონზე
             contactModal.addEventListener('click', (e) => {
                 if (e.target === contactModal) {
                     closeModal('contact-modal');
