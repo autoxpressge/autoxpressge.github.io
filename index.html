@@ -14,8 +14,6 @@
                 extend: {
                     colors: {
                         'primary-red': '#dc2626', // სტანდარტული წითელი
-                        'facebook-blue': '#1877F2',
-                        'tiktok-black': '#000000',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -68,12 +66,11 @@
                 <span class="text-gray-800">Auto</span><span class="text-primary-red">X</span><span class="text-gray-800">press</span>
             </div>
 
-            <!-- ნავიგაციის ლინკები (დესკტოპზე) -->
+            <!-- ნავიგაციის ლინკები (დესკტოპზე) - 'კონტაქტი' ამოღებულია -->
             <nav class="hidden md:flex space-x-8">
                 <a href="#" data-page="home" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300 active-link">მთავარი</a>
                 <a href="#" data-page="products" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300">პროდუქტები</a>
                 <a href="#" data-page="about" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300">ჩვენს შესახებ</a>
-                <a href="#" data-page="contact" class="nav-link text-gray-700 hover:text-primary-red font-semibold transition duration-300">კონტაქტი</a>
             </nav>
 
             <!-- მობილურის მენიუს ღილაკი -->
@@ -81,12 +78,11 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
-        <!-- მობილურის მენიუ (ჩამოსაშლელი) -->
+        <!-- მობილურის მენიუ (ჩამოსაშლელი) - 'კონტაქტი' ამოღებულია -->
         <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-2 bg-gray-50 rounded-b-xl">
             <a href="#" data-page="home" class="nav-link-mobile block text-gray-700 hover:bg-gray-200 p-2 rounded-lg transition duration-150 active-link">მთავარი</a>
             <a href="#" data-page="products" class="nav-link-mobile block text-gray-700 hover:bg-gray-200 p-2 rounded-lg transition duration-150">პროდუქტები</a>
             <a href="#" data-page="about" class="nav-link-mobile block text-gray-700 hover:bg-gray-200 p-2 rounded-lg transition duration-150">ჩვენს შესახებ</a>
-            <a href="#" data-page="contact" class="nav-link-mobile block text-gray-700 hover:bg-gray-200 p-2 rounded-lg transition duration-150">კონტაქტი</a>
         </div>
     </header>
 
@@ -232,65 +228,11 @@
                 </div>
             </div>
         </section>
-
-        <!-- კონტაქტის (ინფორმაციის) სექცია - განახლებული -->
-        <section id="contact" data-section="contact" class="page-content hidden py-16 sm:py-24 bg-gray-50">
-            <div class="container mx-auto px-4 max-w-3xl">
-                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">დაგვიკავშირდით</h2>
-                
-                <div class="bg-white p-8 rounded-2xl shadow-xl space-y-6">
-                    <p class="text-lg text-gray-600 text-center mb-8">
-                        შეკვეთისთვის ან ნებისმიერი შეკითხვისთვის, დაგვიკავშირდით პირდაპირ ქვემოთ მოცემული არხების გამოყენებით.
-                    </p>
-
-                    <!-- საკონტაქტო ინფორმაცია -->
-                    <div class="space-y-4">
-                        <!-- ტელეფონი -->
-                        <div class="flex items-center p-4 bg-primary-red bg-opacity-5 rounded-xl border-l-4 border-primary-red">
-                            <svg class="w-6 h-6 mr-4 text-primary-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                            <div>
-                                <span class="block text-sm font-semibold text-gray-800">ტელეფონი:</span>
-                                <a href="tel:+995577960880" class="text-xl font-bold text-primary-red hover:underline transition">+995 577 96 08 80</a>
-                            </div>
-                        </div>
-                        
-                        <!-- ელ. ფოსტა -->
-                        <div class="flex items-center p-4 bg-primary-red bg-opacity-5 rounded-xl border-l-4 border-primary-red">
-                            <svg class="w-6 h-6 mr-4 text-primary-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            <div>
-                                <span class="block text-sm font-semibold text-gray-800">ელ. ფოსტა:</span>
-                                <a href="mailto:autoxpressge@gmail.com" class="text-xl font-bold text-primary-red hover:underline transition">autoxpressge@gmail.com</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- სოციალური მედია -->
-                    <div class="pt-6 border-t mt-8">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">მოგვძებნეთ სოციალურ ქსელებში</h3>
-                        <div class="flex justify-center space-x-6">
-                            
-                            <!-- Facebook -->
-                            <a href="https://www.facebook.com/profile.php?id=61583140580493" target="_blank" rel="noopener noreferrer" 
-                               class="flex items-center justify-center w-14 h-14 bg-facebook-blue text-white rounded-full shadow-lg hover:bg-blue-800 transition transform hover:scale-110">
-                                <!-- Facebook Icon (Inline SVG) -->
-                                <svg fill="currentColor" class="w-7 h-7" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5h2v-2h-2V9.5c0-.85.34-1.3 1.2-1.3h.8V6.5h-1.6c-1.57 0-2.4 1.1-2.4 2.5V11.5H10v2h2.5V20H10v-6.5h-2V11.5h2V6.8c0-2.6 1.76-4.3 4.4-4.3h3.6V5h-3.6c-1 0-1.4.34-1.4 1V11.5h3.5v2h-3.5V20h-2.1v-6.5z"/></svg>
-                            </a>
-                            
-                            <!-- TikTok -->
-                            <a href="https://www.tiktok.com/@autoxpress.ge" target="_blank" rel="noopener noreferrer" 
-                               class="flex items-center justify-center w-14 h-14 bg-tiktok-black text-white rounded-full shadow-lg hover:bg-gray-700 transition transform hover:scale-110">
-                                <!-- TikTok Icon (Inline SVG) -->
-                                <svg fill="currentColor" class="w-7 h-7" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 10c0 .83-.67 1.5-1.5 1.5H12v-3h1.5c.83 0 1.5.67 1.5 1.5zm-3 4H10v-5h2.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H12v2zm-2-7h.5c.83 0 1.5-.67 1.5-1.5S13.33 7 12.5 7h-1.5v2zM12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8z"/></svg>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- /კონტაქტის (ინფორმაციის) სექცია -->
+        
+        <!-- 'კონტაქტი' სექცია ამოღებულია -->
     </main>
 
-    <!-- ქვედა კოლონტიტული -->
+    <!-- ქვედა კოლონტიტული (განახლებული) -->
     <footer class="bg-gray-800 text-white mt-12 py-8 rounded-t-xl">
         <div class="container mx-auto px-4 text-center">
             <!-- ბრენდის სახელი -->
@@ -298,15 +240,33 @@
                 <span class="text-white">Auto</span><span class="text-primary-red">X</span><span class="text-white">press</span>
             </div>
             
-            <!-- საკონტაქტო ინფორმაცია footer-ში -->
-            <div class="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-8 mb-4 text-gray-300">
+            <!-- საკონტაქტო და სოციალური ინფორმაცია -->
+            <div class="flex flex-col sm:flex-row flex-wrap justify-center items-center space-y-2 sm:space-y-0 sm:space-x-8 mb-4 text-gray-300">
+                
+                <!-- ტელეფონი -->
+                <a href="tel:+995577960880" class="hover:text-primary-red transition duration-200 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                    +995 577 96 08 80
+                </a>
+                
+                <!-- ელ. ფოსტა -->
                 <a href="mailto:autoxpressge@gmail.com" class="hover:text-primary-red transition duration-200 flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     autoxpressge@gmail.com
                 </a>
-                <a href="tel:+995577960880" class="hover:text-primary-red transition duration-200 flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                    +995 577 96 08 80
+
+                <!-- TikTok -->
+                <a href="https://www.tiktok.com/@autoxpress.ge" target="_blank" rel="noopener noreferrer" class="hover:text-primary-red transition duration-200 flex items-center">
+                    <!-- TikTok Icon (Inline SVG) -->
+                    <svg fill="currentColor" class="w-4 h-4 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 10c0 .83-.67 1.5-1.5 1.5H12v-3h1.5c.83 0 1.5.67 1.5 1.5zm-3 4H10v-5h2.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H12v2zm-2-7h.5c.83 0 1.5-.67 1.5-1.5S13.33 7 12.5 7h-1.5v2zM12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8z"/></svg>
+                    @autoxpress.ge
+                </a>
+
+                <!-- Facebook -->
+                <a href="https://www.facebook.com/profile.php?id=61583140580493" target="_blank" rel="noopener noreferrer" class="hover:text-primary-red transition duration-200 flex items-center">
+                    <!-- Facebook Icon (Inline SVG) -->
+                    <svg fill="currentColor" class="w-4 h-4 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5h2v-2h-2V9.5c0-.85.34-1.3 1.2-1.3h.8V6.5h-1.6c-1.57 0-2.4 1.1-2.4 2.5V11.5H10v2h2.5V20H10v-6.5h-2V11.5h2V6.8c0-2.6 1.76-4.3 4.4-4.3h3.6V5h-3.6c-1 0-1.4.34-1.4 1V11.5h3.5v2h-3.5V20h-2.1v-6.5z"/></svg>
+                    autox press
                 </a>
             </div>
             <!-- /საკონტაქტო ინფორმაციის ბლოკი -->
@@ -327,7 +287,8 @@
             
             // სექციების და ნავიგაციის ლინკების შერჩევა
             const sections = document.querySelectorAll('.page-content');
-            const navLinks = document.querySelectorAll('.nav-link, .nav-link-mobile');
+            // 'კონტაქტი' ლინკი ამოღებულია
+            const navLinks = document.querySelectorAll('.nav-link, .nav-link-mobile'); 
             const logoLink = document.getElementById('logo-link');
 
             const productCategories = document.getElementById('product-categories');
