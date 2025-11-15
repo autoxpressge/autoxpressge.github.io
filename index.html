@@ -14,6 +14,8 @@
                 extend: {
                     colors: {
                         'primary-red': '#dc2626', // სტანდარტული წითელი
+                        'facebook-blue': '#1877F2',
+                        'tiktok-black': '#000000',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -231,56 +233,61 @@
             </div>
         </section>
 
-        <!-- კონტაქტის ფორმის სექცია (თავდაპირველად დამალულია) -->
-        <section id="contact" data-section="contact" class="page-content hidden py-16 sm:py-24 bg-white">
-            <div class="container mx-auto px-4 max-w-2xl">
-                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">კონტაქტი</h2>
+        <!-- კონტაქტის (ინფორმაციის) სექცია - განახლებული -->
+        <section id="contact" data-section="contact" class="page-content hidden py-16 sm:py-24 bg-gray-50">
+            <div class="container mx-auto px-4 max-w-3xl">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">დაგვიკავშირდით</h2>
                 
-                <!-- საკონტაქტო ინფორმაციის ბლოკი -->
-                <div class="mb-8 p-6 bg-primary-red bg-opacity-10 rounded-2xl shadow-md space-y-3">
-                    <p class="flex items-center text-gray-700 font-medium">
-                        <!-- ტელეფონის ხატულა -->
-                        <svg class="w-5 h-5 mr-3 text-primary-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                        <span class="font-bold mr-2">ტელეფონი:</span>
-                        <a href="tel:+995577960880" class="text-primary-red hover:underline">+995 577 96 08 80</a>
+                <div class="bg-white p-8 rounded-2xl shadow-xl space-y-6">
+                    <p class="text-lg text-gray-600 text-center mb-8">
+                        შეკვეთისთვის ან ნებისმიერი შეკითხვისთვის, დაგვიკავშირდით პირდაპირ ქვემოთ მოცემული არხების გამოყენებით.
                     </p>
-                    <p class="flex items-center text-gray-700 font-medium">
-                        <!-- ელ. ფოსტის ხატულა -->
-                        <svg class="w-5 h-5 mr-3 text-primary-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        <span class="font-bold mr-2">ელ. ფოსტა:</span>
-                        <a href="mailto:autoxpressge@gmail.com" class="text-primary-red hover:underline">autoxpressge@gmail.com</a>
-                    </p>
+
+                    <!-- საკონტაქტო ინფორმაცია -->
+                    <div class="space-y-4">
+                        <!-- ტელეფონი -->
+                        <div class="flex items-center p-4 bg-primary-red bg-opacity-5 rounded-xl border-l-4 border-primary-red">
+                            <svg class="w-6 h-6 mr-4 text-primary-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                            <div>
+                                <span class="block text-sm font-semibold text-gray-800">ტელეფონი:</span>
+                                <a href="tel:+995577960880" class="text-xl font-bold text-primary-red hover:underline transition">+995 577 96 08 80</a>
+                            </div>
+                        </div>
+                        
+                        <!-- ელ. ფოსტა -->
+                        <div class="flex items-center p-4 bg-primary-red bg-opacity-5 rounded-xl border-l-4 border-primary-red">
+                            <svg class="w-6 h-6 mr-4 text-primary-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <div>
+                                <span class="block text-sm font-semibold text-gray-800">ელ. ფოსტა:</span>
+                                <a href="mailto:autoxpressge@gmail.com" class="text-xl font-bold text-primary-red hover:underline transition">autoxpressge@gmail.com</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- სოციალური მედია -->
+                    <div class="pt-6 border-t mt-8">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">მოგვძებნეთ სოციალურ ქსელებში</h3>
+                        <div class="flex justify-center space-x-6">
+                            
+                            <!-- Facebook -->
+                            <a href="https://www.facebook.com/profile.php?id=61583140580493" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-center w-14 h-14 bg-facebook-blue text-white rounded-full shadow-lg hover:bg-blue-800 transition transform hover:scale-110">
+                                <!-- Facebook Icon (Inline SVG) -->
+                                <svg fill="currentColor" class="w-7 h-7" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 13.5h2v-2h-2V9.5c0-.85.34-1.3 1.2-1.3h.8V6.5h-1.6c-1.57 0-2.4 1.1-2.4 2.5V11.5H10v2h2.5V20H10v-6.5h-2V11.5h2V6.8c0-2.6 1.76-4.3 4.4-4.3h3.6V5h-3.6c-1 0-1.4.34-1.4 1V11.5h3.5v2h-3.5V20h-2.1v-6.5z"/></svg>
+                            </a>
+                            
+                            <!-- TikTok -->
+                            <a href="https://www.tiktok.com/@autoxpress.ge" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-center w-14 h-14 bg-tiktok-black text-white rounded-full shadow-lg hover:bg-gray-700 transition transform hover:scale-110">
+                                <!-- TikTok Icon (Inline SVG) -->
+                                <svg fill="currentColor" class="w-7 h-7" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 10c0 .83-.67 1.5-1.5 1.5H12v-3h1.5c.83 0 1.5.67 1.5 1.5zm-3 4H10v-5h2.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H12v2zm-2-7h.5c.83 0 1.5-.67 1.5-1.5S13.33 7 12.5 7h-1.5v2zM12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8z"/></svg>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <!-- /საკონტაქტო ინფორმაციის ბლოკი -->
-                
-                <!-- ფორმა FormSubmit-ის გამოყენებით: ელფოსტა ჩანაცვლებულია -->
-                <form action="https://formsubmit.co/autoxpressge@gmail.com" method="POST" class="bg-gray-50 p-8 rounded-2xl shadow-xl space-y-6">
-                    <!-- FormSubmit-ის ნაგულისხმევი "მადლობა" გვერდიდან ჩვენს კონტაქტების გვერდზე დასაბრუნებლად -->
-                    <input type="hidden" name="_next" value="">
-                    
-                    <!-- ველები -->
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">სახელი</label>
-                        <!-- name ატრიბუტი FormSubmit-ისთვისაა საჭირო -->
-                        <input type="text" id="name" name="Name" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-primary-red focus:border-primary-red transition" placeholder="თქვენი სახელი" required>
-                    </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">ელ. ფოსტა</label>
-                        <!-- name ატრიბუტი FormSubmit-ისთვისაა საჭირო -->
-                        <input type="email" id="email" name="Email" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-primary-red focus:border-primary-red transition" placeholder="თქვენი ელ. ფოსტა" required>
-                    </div>
-                    <div>
-                        <label for="message" class="block text-sm font-medium text-gray-700 mb-1">შეტყობინება</label>
-                        <!-- name ატრიბუტი FormSubmit-ისთვისაა საჭირო -->
-                        <textarea id="message" name="Message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-primary-red focus:border-primary-red transition" placeholder="თქვენი შეკითხვა..." required></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-primary-red text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition duration-300 transform hover:scale-[1.01]">
-                        გაგზავნა
-                    </button>
-                    <!-- წინა სტატუსის შეტყობინება ამოღებულია, რადგან FormSubmit-ი ამას ამუშავებს -->
-                </form>
             </div>
         </section>
+        <!-- /კონტაქტის (ინფორმაციის) სექცია -->
     </main>
 
     <!-- ქვედა კოლონტიტული -->
@@ -316,9 +323,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             const menuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            // ძველი form event listener ამოღებულია FormSubmit-ის გამოყენების გამო
-            // const contactForm = document.querySelector('#contact form');
-            // const statusMessage = document.getElementById('status-message');
             const viewProductsButton = document.getElementById('view-products-button');
             
             // სექციების და ნავიგაციის ლინკების შერჩევა
@@ -466,9 +470,7 @@
                 mobileMenu.classList.toggle('hidden');
             });
 
-            // 2. ფორმის გაგზავნის დამუშავება - ლოკალური სიმულაცია ამოღებულია და ჩანაცვლებულია FormSubmit-ით
-            
-            // 3. ნავიგაციის ლინკებზე დაწკაპუნების მოსმენა
+            // 2. ნავიგაციის ლინკებზე დაწკაპუნების მოსმენა
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -486,7 +488,7 @@
                 });
             });
 
-            // 4. "პროდუქტების ნახვა" ღილაკზე დაჭერით გადართვა
+            // 3. "პროდუქტების ნახვა" ღილაკზე დაჭერით გადართვა
             if (viewProductsButton) {
                 viewProductsButton.addEventListener('click', () => {
                     showCategories(); // კატეგორიების ხედის ჩვენება
@@ -494,7 +496,7 @@
                 });
             }
 
-            // 5. კატეგორიის ღილაკებზე დაჭერა (მხოლოდ "ძირითადი ნაწილები" მუშაობს ამ ეტაპზე)
+            // 4. კატეგორიის ღილაკებზე დაჭერა (მხოლოდ "ძირითადი ნაწილები" მუშაობს ამ ეტაპზე)
             subcategoryButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     if (button.dataset.category === 'basic') {
@@ -506,10 +508,10 @@
                 });
             });
 
-            // 6. უკან კატეგორიებში ღილაკი
+            // 5. უკან კატეგორიებში ღილაკი
             backToCategoriesButton.addEventListener('click', showCategories);
             
-            // 7. პროდუქტის ბარათზე დაჭერა (დეტალების სანახავად)
+            // 6. პროდუქტის ბარათზე დაჭერა (დეტალების სანახავად)
             productCards.forEach(card => {
                 card.addEventListener('click', () => {
                     const productId = card.dataset.productId;
@@ -517,14 +519,14 @@
                 });
             });
 
-            // 8. უკან პროდუქტების სიაში ღილაკი
+            // 7. უკან პროდუქტების სიაში ღილაკი
             backToListButton.addEventListener('click', () => {
                 productDetailSection.classList.add('hidden'); // დეტალების დამალვა
                 showPage('products'); // პროდუქტების სექციის ჩვენება
                 showProductList('basic'); // ისევ სიის ჩვენება
             });
 
-            // 9. ლოგოზე დაჭერა მთავარ გვერდზე დასაბრუნებლად
+            // 8. ლოგოზე დაჭერა მთავარ გვერდზე დასაბრუნებლად
             logoLink.addEventListener('click', () => {
                 showPage('home');
             });
