@@ -17,31 +17,13 @@ function closeModal(modalId) {
 
 // --- Core UI Functions (Same as before) ---
 
-// DOM Elements
-const menuButton = document.getElementById("mobile-menu-button");
-const mobileMenu = document.getElementById("mobile-menu");
-const viewProductsButton = document.getElementById("view-products-button");
-const sections = document.querySelectorAll(".page-content");
-const navLinks = document.querySelectorAll(
-  ".nav-link, .nav-link-mobile, #logo-link",
-);
-const productCategories = document.getElementById("product-categories");
-const subcategoryView = document.getElementById("subcategory-view");
-const backToCategoriesButton = document.getElementById("back-to-categories");
-const subcategoryButtons = document.querySelectorAll(".show-subcategory-btn");
-const productCards = document.querySelectorAll(".product-card");
-const productDetailSection = document.getElementById("product-detail");
-const backToListButton = document.getElementById("back-to-list");
-const subcategoryTitle = document.getElementById("subcategory-title");
-const basicPartsList = document.getElementById("basic-parts-list");
-const emptyCategoryMessage = document.getElementById("empty-category-message");
-
-// Modal Elements
-const contactToOrderButton = document.getElementById("contact-to-order-button");
-const contactModal = document.getElementById("contact-modal");
-const closeModalButton = document.getElementById("close-modal");
-const gmailOrderLink = document.getElementById("gmail-order-link");
-const footerEmailLink = document.getElementById("footer-email-link"); // Footer Email Link
+// DOM Elements (will be initialized in DOMContentLoaded)
+let menuButton, mobileMenu, viewProductsButton, sections, navLinks;
+let productCategories, subcategoryView, backToCategoriesButton;
+let subcategoryButtons, productCards, productDetailSection, backToListButton;
+let subcategoryTitle, basicPartsList, emptyCategoryMessage;
+let contactToOrderButton, contactModal, closeModalButton;
+let gmailOrderLink, footerEmailLink;
 
 // Product Data (in-memory)
 const productData = {
@@ -67,6 +49,8 @@ const categoryTitles = {
 // --- Core UI Functions ---
 
 function showPage(pageId) {
+  if (!sections) return;
+  
   sections.forEach((section) => {
     section.classList.add("hidden");
     section.classList.remove("active");
@@ -90,27 +74,33 @@ function showPage(pageId) {
     }
   });
 
-  mobileMenu.classList.add("hidden");
+  if (mobileMenu) {
+    mobileMenu.classList.add("hidden");
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function showProductList(category) {
+  if (!productCategories || !subcategoryView) return;
+  
   productCategories.classList.add("opacity-0");
 
-  basicPartsList.classList.add("hidden");
-  emptyCategoryMessage.classList.add("hidden");
+  if (basicPartsList) basicPartsList.classList.add("hidden");
+  if (emptyCategoryMessage) emptyCategoryMessage.classList.add("hidden");
 
   setTimeout(() => {
     productCategories.classList.add("hidden");
     subcategoryView.classList.remove("hidden");
 
-    subcategoryTitle.textContent = categoryTitles[category] || "პროდუქტები";
-    subcategoryTitle.classList.remove("text-gray-800");
-    subcategoryTitle.classList.add("text-primary-red");
+    if (subcategoryTitle) {
+      subcategoryTitle.textContent = categoryTitles[category] || "პროდუქტები";
+      subcategoryTitle.classList.remove("text-gray-800");
+      subcategoryTitle.classList.add("text-primary-red");
+    }
 
-    if (category === "basic") {
+    if (category === "basic" && basicPartsList) {
       basicPartsList.classList.remove("hidden");
-    } else {
+    } else if (emptyCategoryMessage) {
       emptyCategoryMessage.classList.remove("hidden");
     }
 
@@ -121,11 +111,15 @@ function showProductList(category) {
 }
 
 function showCategories() {
-  productDetailSection.classList.add("hidden");
+  if (!productCategories || !subcategoryView) return;
+  
+  if (productDetailSection) productDetailSection.classList.add("hidden");
   subcategoryView.classList.add("opacity-0");
 
-  subcategoryTitle.classList.remove("text-primary-red");
-  subcategoryTitle.classList.add("text-gray-800");
+  if (subcategoryTitle) {
+    subcategoryTitle.classList.remove("text-primary-red");
+    subcategoryTitle.classList.add("text-gray-800");
+  }
 
   setTimeout(() => {
     subcategoryView.classList.add("hidden");
@@ -139,6 +133,8 @@ function showCategories() {
 }
 
 function showProductDetail(productId) {
+  if (!productDetailSection) return;
+  
   const product = productData[productId];
 
   if (!product) {
@@ -147,19 +143,24 @@ function showProductDetail(productId) {
   }
 
   // Update content
-  document.getElementById("detail-name").textContent = product.name;
-  document.getElementById("detail-price").textContent = `${product.price}₾`;
+  const detailName = document.getElementById("detail-name");
+  const detailPrice = document.getElementById("detail-price");
+  if (detailName) detailName.textContent = product.name;
+  if (detailPrice) detailPrice.textContent = `${product.price}₾`;
 
   const descList = document.getElementById("detail-description-list");
-  descList.innerHTML = "";
-  product.description.forEach((desc) => {
-    const li = document.createElement("li");
-    li.textContent = desc;
-    descList.appendChild(li);
-  });
+  if (descList) {
+    descList.innerHTML = "";
+    product.description.forEach((desc) => {
+      const li = document.createElement("li");
+      li.textContent = desc;
+      descList.appendChild(li);
+    });
+  }
 
   // Hide list and show details
-  document.getElementById("products").classList.add("hidden");
+  const productsSection = document.getElementById("products");
+  if (productsSection) productsSection.classList.add("hidden");
   productDetailSection.classList.remove("hidden");
   productDetailSection.classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -168,6 +169,30 @@ function showProductDetail(productId) {
 // --- Main Event Listeners ---
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Initialize all DOM elements
+  menuButton = document.getElementById("mobile-menu-button");
+  mobileMenu = document.getElementById("mobile-menu");
+  viewProductsButton = document.getElementById("view-products-button");
+  sections = document.querySelectorAll(".page-content");
+  navLinks = document.querySelectorAll(
+    ".nav-link, .nav-link-mobile, #logo-link",
+  );
+  productCategories = document.getElementById("product-categories");
+  subcategoryView = document.getElementById("subcategory-view");
+  backToCategoriesButton = document.getElementById("back-to-categories");
+  subcategoryButtons = document.querySelectorAll(".show-subcategory-btn");
+  productCards = document.querySelectorAll(".product-card");
+  productDetailSection = document.getElementById("product-detail");
+  backToListButton = document.getElementById("back-to-list");
+  subcategoryTitle = document.getElementById("subcategory-title");
+  basicPartsList = document.getElementById("basic-parts-list");
+  emptyCategoryMessage = document.getElementById("empty-category-message");
+  contactToOrderButton = document.getElementById("contact-to-order-button");
+  contactModal = document.getElementById("contact-modal");
+  closeModalButton = document.getElementById("close-modal");
+  gmailOrderLink = document.getElementById("gmail-order-link");
+  footerEmailLink = document.getElementById("footer-email-link");
+
   // GMAIL LINK CONFIGURATION (FIX FOR WEBSITE)
   const recipientEmail = "autoxpressge@gmail.com";
   const subject = "შეკვეთა | AutoXpress-ის საიტიდან";
@@ -196,26 +221,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 3. მობილურის მენიუს გადართვა
-  menuButton.addEventListener("click", () => {
-    mobileMenu.classList.toggle("hidden");
-  });
+  if (menuButton && mobileMenu) {
+    menuButton.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  }
 
   // 4. ნავიგაციის ლინკებზე დაწკაპუნების მოსმენა
-  navLinks.forEach((link) => {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
+  if (navLinks && navLinks.length > 0) {
+    navLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
 
-      if (link.dataset.page === "products") {
-        showCategories();
-        productDetailSection.classList.add("hidden");
-      }
+        if (link.dataset.page === "products") {
+          showCategories();
+          if (productDetailSection) productDetailSection.classList.add("hidden");
+        }
 
-      const page = link.dataset.page;
-      if (page) {
-        showPage(page);
-      }
+        const page = link.dataset.page;
+        if (page) {
+          showPage(page);
+        }
+      });
     });
-  });
+  }
 
   // 5. "პროდუქტების ნახვა" ღილაკზე დაჭერით გადართვა
   if (viewProductsButton) {
@@ -226,52 +255,69 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 6. კატეგორიის ღილაკებზე დაჭერა
-  subcategoryButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const category = button.dataset.category;
-      showProductList(category);
+  if (subcategoryButtons && subcategoryButtons.length > 0) {
+    subcategoryButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const category = button.dataset.category;
+        showProductList(category);
+      });
     });
-  });
+  }
 
   // 7. უკან კატეგორიებში ღილაკი
-  backToCategoriesButton.addEventListener("click", showCategories);
+  if (backToCategoriesButton) {
+    backToCategoriesButton.addEventListener("click", showCategories);
+  }
 
   // 8. პროდუქტის ბარათზე დაჭერა (დეტალების სანახავად)
-  productCards.forEach((card) => {
-    card.addEventListener("click", () => {
-      const productId = card.dataset.productId;
-      showProductDetail(productId);
+  if (productCards && productCards.length > 0) {
+    productCards.forEach((card) => {
+      card.addEventListener("click", () => {
+        const productId = card.dataset.productId;
+        showProductDetail(productId);
+      });
     });
-  });
+  }
 
   // 9. უკან პროდუქტების სიაში ღილაკი
-  backToListButton.addEventListener("click", () => {
-    productDetailSection.classList.add("hidden");
-    showPage("products");
-    showProductList("basic");
-  });
+  if (backToListButton) {
+    backToListButton.addEventListener("click", () => {
+      if (productDetailSection) productDetailSection.classList.add("hidden");
+      showPage("products");
+      showProductList("basic");
+    });
+  }
 
   // 10. ლოგოზე დაჭერა მთავარ გვერდზე დასაბრუნებლად
-  document.getElementById("logo-link").addEventListener("click", () => {
-    showPage("home");
-  });
+  const logoLink = document.getElementById("logo-link");
+  if (logoLink) {
+    logoLink.addEventListener("click", () => {
+      showPage("home");
+    });
+  }
 
   // 11. საკონტაქტო ღილაკზე დაჭერა (მოდელის გასახსნელად)
-  contactToOrderButton.addEventListener("click", () => {
-    showModal("contact-modal");
-  });
+  if (contactToOrderButton) {
+    contactToOrderButton.addEventListener("click", () => {
+      showModal("contact-modal");
+    });
+  }
 
   // 12. მოდელის დახურვა
-  closeModalButton.addEventListener("click", () => {
-    closeModal("contact-modal");
-  });
+  if (closeModalButton) {
+    closeModalButton.addEventListener("click", () => {
+      closeModal("contact-modal");
+    });
+  }
 
   // 13. ასევე, თუ დააწკაპუნებენ მოდელის ფონზე
-  contactModal.addEventListener("click", (e) => {
-    if (e.target === contactModal) {
-      closeModal("contact-modal");
-    }
-  });
+  if (contactModal) {
+    contactModal.addEventListener("click", (e) => {
+      if (e.target === contactModal) {
+        closeModal("contact-modal");
+      }
+    });
+  }
 
   // გვერდის ჩატვირთვისას ნაგულისხმევი გვერდის გამოჩენა
   showPage("home");
